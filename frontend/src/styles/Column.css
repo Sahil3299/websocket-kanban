@@ -1,0 +1,54 @@
+.column {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 20px;
+  min-height: 500px;
+  transition: all 0.3s ease;
+}
+
+.column.drop-over {
+  background: #e3f2fd;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.column-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.task-count {
+  background: #e0e0e0;
+  color: #333;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.empty-column {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-style: italic;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  margin-top: 10px;
+}

@@ -1,0 +1,9 @@
+{
+  "short_name": "Kanban Board",
+  "name": "WebSocket Kanban Board",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
