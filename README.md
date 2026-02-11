@@ -71,6 +71,24 @@ Includes **file uploads, analytics charts, drag‑and‑drop workflow, and full 
 
 ---
 
+## 📸 Screenshots
+
+> Add your project screenshots inside a `/screenshots` folder in the repository and update the paths below.
+
+### 🏠 Kanban Board View
+
+![Kanban Board](screenshots/kanban-board.png)
+
+### 📝 Task Creation / Edit
+
+![Task Form](screenshots/task-form.png)
+
+### 📊 Progress Analytics
+
+![Progress Chart](screenshots/progress-chart.png)
+
+---
+
 ## 🛠 Tech Stack
 
 ### Frontend
