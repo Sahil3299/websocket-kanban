@@ -1,30 +1,16 @@
 import React, { useState, useContext } from 'react';
-import { useDrop } from 'react-dnd';
 import Column from './Column';
 import TaskForm from './TaskForm';
 import { TaskContext } from '../context/TaskContext';
-import { socket } from '../services/socket';
 import { columns } from '../constants';
 import '../styles/KanbanBoard.css';
 
 const KanbanBoard = () => {
-  const { tasks, addTask } = useContext(TaskContext);
+  const { tasks, addTask, isConnected } = useContext(TaskContext);
   const [showForm, setShowForm] = useState(false);
 
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: 'task',
-    drop: (item) => handleDrop(item.id, 'backlog'),
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-    }),
-  }));
-
-  const handleDrop = (taskId, newColumn) => {
-    socket.emit('task:move', { taskId, newColumn });
-  };
-
   const handleCreateTask = (taskData) => {
-    socket.emit('task:create', taskData);
+    addTask(taskData);
     setShowForm(false);
   };
 
@@ -60,8 +46,8 @@ const KanbanBoard = () => {
       </div>
 
       <div className="connection-status">
-        <div className={`status-indicator ${socket.connected ? 'connected' : 'disconnected'}`} />
-        <span>{socket.connected ? 'Connected' : 'Disconnected'}</span>
+        <div className={`status-indicator ${isConnected ? 'connected' : 'disconnected'}`} />
+        <span>{isConnected ? 'Connected to WebSocket' : 'Disconnected'}</span>
       </div>
     </div>
   );

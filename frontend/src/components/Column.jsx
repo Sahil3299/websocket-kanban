@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useDrop } from 'react-dnd';
 import Task from './Task';
-import { socket } from '../services/socket';
+import { TaskContext } from '../context/TaskContext';
 import '../styles/Column.css';
 
 const Column = ({ id, title, tasks, color }) => {
+  const { moveTask } = useContext(TaskContext);
+  
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'task',
     drop: (item) => handleDrop(item.id),
@@ -14,7 +16,7 @@ const Column = ({ id, title, tasks, color }) => {
   }));
 
   const handleDrop = (taskId) => {
-    socket.emit('task:move', { taskId, newColumn: id });
+    moveTask(taskId, id);
   };
 
   return (

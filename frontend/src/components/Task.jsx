@@ -1,11 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { useDrag } from 'react-dnd';
 import { TaskContext } from '../context/TaskContext';
-import { socket } from '../services/socket';
 import '../styles/Task.css';
 
 const Task = ({ task }) => {
-  const { deleteTask } = useContext(TaskContext);
+  const { updateTask, deleteTask } = useContext(TaskContext);
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
 
@@ -30,13 +29,13 @@ const Task = ({ task }) => {
   };
 
   const handleUpdate = () => {
-    socket.emit('task:update', editedTask);
+    updateTask(task.id, editedTask);
     setIsEditing(false);
   };
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this task?')) {
-      socket.emit('task:delete', task.id);
+      deleteTask(task.id);
     }
   };
 
@@ -53,11 +52,13 @@ const Task = ({ task }) => {
             value={editedTask.title}
             onChange={(e) => setEditedTask({...editedTask, title: e.target.value})}
             className="edit-input"
+            placeholder="Task title"
           />
           <textarea
             value={editedTask.description}
             onChange={(e) => setEditedTask({...editedTask, description: e.target.value})}
             className="edit-textarea"
+            placeholder="Task description"
           />
           <div className="edit-actions">
             <button onClick={handleUpdate} className="save-btn">Save</button>

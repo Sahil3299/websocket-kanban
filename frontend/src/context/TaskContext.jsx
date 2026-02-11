@@ -1,60 +1,110 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { socket } from '../services/socket';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { getSocket, disconnectSocket } from '../services/socket';
+import { useAuth } from '../context/AuthContext';
 
 export const TaskContext = createContext();
 
 export const TaskProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
+  const [socket, setSocket] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const { user, getToken } = useAuth();
 
   useEffect(() => {
-    // Listen for task updates from server
-    socket.on('sync:tasks', (initialTasks) => {
-      setTasks(initialTasks);
-    });
+    if (user) {
+      const token = getToken();
+      const socketInstance = getSocket(token);
+      setSocket(socketInstance);
 
-    socket.on('task:created', (newTask) => {
-      setTasks(prev => [...prev, newTask]);
-    });
+      // Update connection status
+      setIsConnected(socketInstance?.connected || false);
+      
+      socketInstance?.on('connect', () => {
+        console.log('Socket connected');
+        setIsConnected(true);
+      });
+      
+      socketInstance?.on('disconnect', () => {
+        console.log('Socket disconnected');
+        setIsConnected(false);
+      });
 
-    socket.on('task:updated', (updatedTask) => {
-      setTasks(prev => prev.map(task => 
-        task.id === updatedTask.id ? updatedTask : task
-      ));
-    });
+      // Listen for task updates
+      socketInstance?.on('sync:tasks', (initialTasks) => {
+        setTasks(initialTasks);
+      });
 
-    socket.on('task:moved', (movedTask) => {
-      setTasks(prev => prev.map(task => 
-        task.id === movedTask.id ? movedTask : task
-      ));
-    });
+      socketInstance?.on('task:created', (newTask) => {
+        setTasks(prev => [...prev, newTask]);
+      });
 
-    socket.on('task:deleted', (taskId) => {
-      setTasks(prev => prev.filter(task => task.id !== taskId));
-    });
+      socketInstance?.on('task:updated', (updatedTask) => {
+        setTasks(prev => prev.map(task => 
+          task.id === updatedTask.id ? updatedTask : task
+        ));
+      });
 
-    return () => {
-      socket.off('sync:tasks');
-      socket.off('task:created');
-      socket.off('task:updated');
-      socket.off('task:moved');
-      socket.off('task:deleted');
-    };
-  }, []);
+      socketInstance?.on('task:moved', (movedTask) => {
+        setTasks(prev => prev.map(task => 
+          task.id === movedTask.id ? movedTask : task
+        ));
+      });
 
-  const addTask = (task) => {
-    socket.emit('task:create', task);
+      socketInstance?.on('task:deleted', (taskId) => {
+        setTasks(prev => prev.filter(task => task.id !== taskId));
+      });
+
+      return () => {
+        if (socketInstance) {
+          socketInstance.off('connect');
+          socketInstance.off('disconnect');
+          socketInstance.off('sync:tasks');
+          socketInstance.off('task:created');
+          socketInstance.off('task:updated');
+          socketInstance.off('task:moved');
+          socketInstance.off('task:deleted');
+        }
+      };
+    } else {
+      if (socket) {
+        disconnectSocket();
+        setSocket(null);
+      }
+      setTasks([]);
+      setIsConnected(false);
+    }
+  }, [user]);
+
+  const addTask = (taskData) => {
+    if (socket) {
+      socket.emit('task:create', taskData);
+    } else {
+      console.error('Socket not connected');
+    }
   };
 
   const updateTask = (taskId, updates) => {
-    socket.emit('task:update', { id: taskId, ...updates });
+    if (socket) {
+      socket.emit('task:update', { id: taskId, ...updates });
+    } else {
+      console.error('Socket not connected');
+    }
   };
 
   const moveTask = (taskId, newColumn) => {
-    socket.emit('task:move', { taskId, newColumn });
+    if (socket) {
+      socket.emit('task:move', { taskId, newColumn });
+    } else {
+      console.error('Socket not connected');
+    }
   };
 
   const deleteTask = (taskId) => {
-    socket.emit('task:delete', taskId);
+    if (socket) {
+      socket.emit('task:delete', taskId);
+    } else {
+      console.error('Socket not connected');
+    }
   };
 
   return (
@@ -63,7 +113,9 @@ export const TaskProvider = ({ children }) => {
       addTask,
       updateTask,
       moveTask,
-      deleteTask
+      deleteTask,
+      socket,
+      isConnected
     }}>
       {children}
     </TaskContext.Provider>

@@ -1,39 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { isMobile } from 'react-device-detect';
-import KanbanBoard from './components/KanbanBoard';
-import ProgressChart from './components/ProgressChart';
+import { AuthProvider } from './context/AuthContext';
 import { TaskProvider } from './context/TaskContext';
+import Navigation from './components/Navigation';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import Dashboard from './components/DashBoard';
+import KanbanBoard from './components/KanbanBoard';
+import MyTasks from './components/MyTasks'; // Add this import
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import './App.css';
 
 function App() {
   return (
-    <TaskProvider>
-      <DndProvider backend={isMobile ? TouchBackend : HTML5Backend}>
-        <div className="app">
-          <header className="app-header">
-            <h1>📊 WebSocket Kanban Board</h1>
-            <p>Real-time task management with team collaboration</p>
-          </header>
-          
-          <div className="app-content">
-            <div className="kanban-section">
-              <KanbanBoard />
+    <Router>
+      <AuthProvider>
+        <TaskProvider>
+          <DndProvider backend={isMobile ? TouchBackend : HTML5Backend}>
+            <div className="app">
+              <Navigation />
+              
+              <Routes>
+                <Route path="/" element={<Navigate to="/dashboard" />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="/board" element={
+                  <ProtectedRoute>
+                    <KanbanBoard />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Add MyTasks route */}
+                <Route path="/mytasks" element={
+                  <ProtectedRoute>
+                    <MyTasks />
+                  </ProtectedRoute>
+                } />
+              </Routes>
             </div>
-            
-            <div className="chart-section">
-              <ProgressChart />
-            </div>
-          </div>
-          
-          <footer className="app-footer">
-            <p>Connected in real-time via WebSocket • Drag tasks between columns</p>
-          </footer>
-        </div>
-      </DndProvider>
-    </TaskProvider>
+          </DndProvider>
+        </TaskProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
