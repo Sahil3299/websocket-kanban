@@ -87,8 +87,7 @@ Includes **file uploads, analytics charts, drag‑and‑drop workflow, and full 
 
 ### Drag-Drop Feature
 
-![Drag-Drop](screenshots/Drag-Drop.mp4)
-
+<video src="screenshots/Drag-Drop.mp4" controls></video>
 ---
 
 ## 🛠 Tech Stack
