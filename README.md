@@ -85,9 +85,7 @@ Includes **file uploads, analytics charts, drag‑and‑drop workflow, and full 
 
 ![Progress Chart](screenshots/Task-Progress.png)
 
-### Drag-Drop Feature
 
-<video src="screenshots/Drag-Drop.mp4" controls></video>
 ---
 
 ## 🛠 Tech Stack
